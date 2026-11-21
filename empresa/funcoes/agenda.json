@@ -1,0 +1,20 @@
+{
+  "_explicacao": "Horários de visita técnica e instalação por dia da semana. vagas_por_horario = quantos atendimentos cabem no mesmo horário.",
+  "horarios": {
+    "segunda": [
+      "09:00",
+      "14:00"
+    ],
+    "quarta": [
+      "09:00",
+      "14:00"
+    ],
+    "sexta": [
+      "14:00"
+    ]
+  },
+  "vagas_por_horario": 2,
+  "sem_atendimento": [
+    "2026-12-25"
+  ]
+}

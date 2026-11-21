@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel do Gestor</title>
+<style>
+  :root { --fundo:#0b0b14; --cartao:#151526; --linha:#2a2a44; --texto:#f2f2fa; --suave:#a3a3c2;
+          --fucsia:#e0218a; --roxo:#7b3fe4; --ciano:#18c6e6; --verde:#2ecc71; --amarelo:#f5b301; --vermelho:#ff4d5e; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--fundo); color:var(--texto); font:16px/1.45 system-ui, "Segoe UI", sans-serif; }
+  header { padding:18px 16px; background:linear-gradient(90deg,var(--fucsia),var(--roxo),var(--ciano)); }
+  header h1 { margin:0; font-size:22px; }
+  header small { opacity:.9; }
+  nav { display:flex; gap:8px; padding:12px 16px; flex-wrap:wrap; border-bottom:1px solid var(--linha); }
+  nav button { background:var(--cartao); color:var(--texto); border:1px solid var(--linha); border-radius:999px;
+               padding:8px 16px; font-size:15px; cursor:pointer; }
+  nav button.ativo { background:var(--roxo); border-color:var(--roxo); }
+  main { padding:16px; max-width:1100px; margin:auto; }
+  .conclusao { font-size:26px; font-weight:700; padding:18px; border-radius:14px; background:var(--cartao);
+               border-left:8px solid var(--verde); margin-bottom:16px; }
+  .conclusao.alerta { border-left-color:var(--amarelo); } .conclusao.ruim { border-left-color:var(--vermelho); }
+  .grade { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
+  .num { background:var(--cartao); border:1px solid var(--linha); border-radius:14px; padding:14px; }
+  .num b { display:block; font-size:34px; } .num span { color:var(--suave); font-size:14px; }
+  .periodo { margin:6px 0 14px; display:flex; gap:8px; flex-wrap:wrap; }
+  .periodo button, .acao { border:0; border-radius:10px; padding:10px 14px; font-size:15px; cursor:pointer;
+               color:#fff; background:var(--roxo); }
+  .acao.verde { background:#1f9d55; } .acao.cinza { background:#3a3a55; } .acao.vermelha { background:#c0392b; }
+  .item { background:var(--cartao); border:1px solid var(--linha); border-radius:14px; padding:14px; margin-bottom:12px; }
+  .item h3 { margin:0 0 4px; font-size:18px; } .motivo { color:var(--suave); font-size:14px; margin:6px 0; }
+  textarea { width:100%; min-height:70px; background:#0f0f1c; color:var(--texto); border:1px solid var(--linha);
+             border-radius:10px; padding:10px; font:inherit; margin:6px 0; }
+  .etq { display:inline-block; padding:2px 10px; border-radius:999px; font-size:13px; margin-right:6px; background:#26264a; }
+  .quente { background:#5c1235; } .morno { background:#4a3a10; } .frio { background:#10324a; }
+  .botoes { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+  h2 { margin:22px 0 10px; font-size:19px; }
+  table { width:100%; border-collapse:collapse; font-size:15px; } td, th { padding:8px; border-bottom:1px solid var(--linha); text-align:left; }
+  a { color:var(--ciano); }
+  .vazio { color:var(--suave); padding:20px; text-align:center; }
+</style>
+</head>
+<body>
+<header><h1>🧠 Gestor Inteligente</h1><small>A IA trabalha como braço direito do líder</small></header>
+<nav>
+  <button data-aba="inicio" class="ativo">📊 Início</button>
+  <button data-aba="fila">✍️ Para aprovar <span id="nfila"></span></button>
+  <button data-aba="contatos">🔥 Contatos</button>
+  <button data-aba="humano">🙋 Com uma pessoa</button>
+  <button data-aba="controles">⚙️ Controles</button>
+</nav>
+<main>
+  <section id="inicio">
+    <div id="conclusao" class="conclusao">Carregando…</div>
+    <div class="periodo">
+      <button data-dias="0">Hoje</button><button data-dias="7">7 dias</button><button data-dias="30">30 dias</button>
+    </div>
+    <div class="grade" id="numeros"></div>
+    <h2>👥 Por pessoa da equipe</h2><div id="pessoas"></div>
+    <h2>💬 Sobre o que falaram</h2><div class="grade" id="assuntos"></div>
+  </section>
+  <section id="fila" hidden></section>
+  <section id="contatos" hidden></section>
+  <section id="humano" hidden></section>
+  <section id="controles" hidden>
+    <div class="item">
+      <h3>Agente</h3>
+      <p id="estado-agente"></p>
+      <div class="botoes">
+        <button class="acao vermelha" onclick="estado({pausado:true})">⏸️ Pausar o agente</button>
+        <button class="acao verde" onclick="estado({pausado:false})">▶️ Ligar o agente</button>
+      </div>
+    </div>
+    <div class="item">
+      <h3>Como a IA envia</h3>
+      <p class="motivo">Comece em "Eu aprovo antes". Passe para os outros só quando confiar nas respostas.</p>
+      <div class="botoes">
+        <button class="acao" onclick="estado({modo:'aprovar'})">✍️ Eu aprovo antes</button>
+        <button class="acao" onclick="estado({modo:'teste'})">🧪 Sozinha só nos números de teste</button>
+        <button class="acao" onclick="estado({modo:'liberado'})">🚀 Sozinha para todos</button>
+      </div>
+    </div>
+  </section>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const brl = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc = s => String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const api = (u, corpo) => fetch(u, corpo ? {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(corpo)} : {}).then(r => r.json());
+let dias = 0;
+
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('ativo', x === b));
+  document.querySelectorAll('main > section').forEach(s => s.hidden = s.id !== b.dataset.aba);
+  carregar();
+});
+document.querySelectorAll('.periodo button').forEach(b => b.onclick = () => { dias = +b.dataset.dias; carregar(); });
+
+async function inicio() {
+  const [s, r] = await Promise.all([api('/api/saude'), api('/api/resumo?dias=' + dias)]);
+  const c = $('#conclusao'); c.textContent = s.conclusao;
+  c.className = 'conclusao' + (s.conclusao.startsWith('🚨') ? ' ruim' : s.conclusao.startsWith('⚠️') ? ' alerta' : '');
+  const n = [
+    ['💬', r.conversas, 'conversas'], ['🤖', r.respostas_enviadas, 'respostas enviadas'],
+    ['✍️', r.na_fila, 'esperando aprovação'], ['🙋', r.passadas_para_humano, 'passadas para uma pessoa'],
+    ['🔥', r.quentes, 'contatos quentes'], ['🟡', r.mornos, 'mornos'],
+    ['🧾', r.orcamentos, 'orçamentos (' + brl(r.valor_orcado) + ')'], ['📅', r.agendamentos, 'agendamentos'],
+    ['💰', r.vendas, 'vendas (' + brl(r.valor_vendido) + ')'], ['⚠️', r.erros, 'erros'],
+  ];
+  $('#numeros').innerHTML = n.map(([i, v, t]) => `<div class="num"><b>${i} ${v}</b><span>${t}</span></div>`).join('');
+  const p = Object.entries(r.por_pessoa || {});
+  $('#pessoas').innerHTML = p.length ? '<table><tr><th>Quem</th><th>Vendas</th><th>Valor</th><th>Tarefas pedidas à IA</th></tr>' +
+    p.map(([q, x]) => `<tr><td>${esc(q)}</td><td>${x.vendas||0}</td><td>${brl(x.valor)}</td><td>${x.tarefas||0}</td></tr>`).join('') + '</table>'
+    : '<div class="vazio">Ainda sem vendas ou tarefas neste período.</div>';
+  $('#assuntos').innerHTML = Object.entries(r.assuntos).map(([a, v]) => `<div class="num"><b>${v}</b><span>${a}</span></div>`).join('');
+}
+
+async function fila() {
+  const itens = await api('/api/fila');
+  $('#nfila').textContent = itens.length ? '(' + itens.length + ')' : '';
+  $('#fila').innerHTML = itens.length ? itens.map(i => `
+    <div class="item" id="i${i.id}">
+      <h3>${esc(i.nome || i.jid)}</h3>
+      <span class="etq ${i.interesse}">${esc(i.interesse)}</span><span class="etq">${esc(i.assunto)}</span>
+      <p class="motivo">Cliente disse: “${esc(i.ultima_do_cliente)}”</p>
+      <p class="motivo">💡 Por que a IA respondeu assim: ${esc(i.motivo)}</p>
+      ${(i.funcoes||[]).map(f => `<p class="motivo">⚙️ ${esc(f.funcao)}: ${f.ok ? '✅' : '❌'} ${esc(f.resultado)}</p>`).join('')}
+      <textarea>${esc(i.bolhas.join('\n\n'))}</textarea>
+      <div class="botoes">
+        <button class="acao verde" onclick="aprovar('${i.id}')">✅ Enviar</button>
+        <button class="acao cinza" onclick="descartar('${i.id}')">🗑️ Não enviar</button>
+        <button class="acao cinza" onclick="nota('${i.id}','bom')">👍 Gostei</button>
+        <button class="acao cinza" onclick="nota('${i.id}','ruim')">👎 Não gostei</button>
+      </div>
+    </div>`).join('') : '<div class="vazio">✅ Nada esperando aprovação.</div>';
+}
+
+async function aprovar(id) {
+  const bolhas = $('#i' + id + ' textarea').value.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+  const r = await api('/api/aprovar', {id, bolhas});
+  if (!r.ok) alertar(r.erro || 'Não consegui enviar. Veja se o WhatsApp está conectado.');
+  fila();
+}
+async function descartar(id) { await api('/api/descartar', {id}); fila(); }
+async function nota(id, nota) {
+  const comentario = window.prompt(nota === 'bom' ? 'O que você gostou? (a IA vai repetir)' : 'O que estava errado? (a IA vai evitar)');
+  if (comentario === null) return;
+  await api('/api/feedback', {nota, comentario, resposta: $('#i' + id + ' textarea').value});
+}
+function alertar(t) { $('#conclusao').textContent = '⚠️ ' + t; }
+
+async function contatos() {
+  const l = await api('/api/contatos');
+  $('#contatos').innerHTML = l.length ? '<table><tr><th>Nota</th><th>Nome</th><th>Interesse</th><th>O que travou</th><th>Última vez</th><th></th></tr>' +
+    l.slice(0, 300).map(c => `<tr><td><span class="etq ${c.faixa}">${c.nota}</span></td><td>${esc(c.nome)}</td><td>${esc(c.produto)}</td>
+      <td>${esc(c.trava)}</td><td>${esc(c.ultima)}</td><td>${c.link ? `<a href="${c.link}" target="_blank">Abrir WhatsApp</a>` : ''}</td></tr>`).join('') + '</table>'
+    : '<div class="vazio">Ainda sem notas. Rode: <b>python nucleo/nota_contatos.py</b></div>';
+}
+
+async function humano() {
+  const h = await api('/api/humano');
+  const l = Object.entries(h);
+  $('#humano').innerHTML = l.length ? l.map(([jid, x]) => `<div class="item"><h3>${esc(jid.split('@')[0])}</h3>
+    <p class="motivo">Desde ${esc(x.desde)} — ${esc(x.motivo)}</p>
+    <button class="acao" onclick="devolver('${jid}')">🤖 Devolver para a IA</button></div>`).join('')
+    : '<div class="vazio">✅ Nenhuma conversa esperando uma pessoa.</div>';
+}
+async function devolver(jid) { await api('/api/devolver', {jid}); humano(); }
+
+async function estado(mudanca) {
+  const e = mudanca ? await api('/api/estado', mudanca) : (await api('/api/saude'));
+  const modos = {aprovar: '✍️ Eu aprovo antes', teste: '🧪 Sozinha só nos números de teste', liberado: '🚀 Sozinha para todos'};
+  $('#estado-agente').innerHTML = (e.pausado ? '⏸️ <b>Pausado</b>' : '▶️ <b>Ligado</b>') + ' — modo: <b>' + modos[e.modo] + '</b>';
+}
+
+function carregar() {
+  const aba = document.querySelector('nav button.ativo').dataset.aba;
+  ({inicio, fila, contatos, humano, controles: () => estado()})[aba]();
+  if (aba !== 'fila') api('/api/fila').then(i => $('#nfila').textContent = i.length ? '(' + i.length + ')' : '');
+}
+carregar();
+// atualiza sozinho, mas não apaga o texto que o líder está editando na fila
+setInterval(() => {
+  if (document.querySelector('nav button.ativo').dataset.aba === 'fila')
+    api('/api/fila').then(i => $('#nfila').textContent = i.length ? '(' + i.length + ')' : '');
+  else carregar();
+}, 15000);
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "impressos",
+    "nome": "Impressos sob encomenda",
+    "descricao": "cartões, panfletos, banners e adesivos a partir de uma arte ou ideia",
+    "tem": true
+  },
+  {
+    "id": "instalacao",
+    "nome": "Instalação de adesivo",
+    "descricao": "visita técnica e instalação em vitrine ou fachada",
+    "tem": true
+  },
+  {
+    "id": "brindes",
+    "nome": "Brindes personalizados",
+    "descricao": "canecas, camisetas, chaveiros",
+    "tem": false
+  }
+]

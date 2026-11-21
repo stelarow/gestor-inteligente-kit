@@ -1,0 +1,4 @@
+# O núcleo usa só a biblioteca padrão do Python.
+# Programas externos: OpenCode (npm i -g opencode-ai), Codex ou Claude Code, Go (para a bridge).
+# Opcional, para transcrever áudios no próprio computador:
+# faster-whisper

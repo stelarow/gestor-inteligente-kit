@@ -1,0 +1,9 @@
+{
+  "ligadas": [
+    "passar_para_humano",
+    "fazer_orcamento",
+    "agenda",
+    "cadastrar_cliente",
+    "registrar_venda"
+  ]
+}

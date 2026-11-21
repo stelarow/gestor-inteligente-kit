@@ -1,0 +1,43 @@
+{
+  "_explicacao": "Fórmula: soma (quantidade x preço por unidade) + custo_fixo, vezes as peças, vezes o multiplicador. Nunca abaixo do mínimo.",
+  "servicos": {
+    "impressao": {
+      "variaveis": {
+        "area_m2": {
+          "rotulo": "Área impressa",
+          "unidade": "m²",
+          "preco_por_unidade": 18
+        },
+        "acabamentos": {
+          "rotulo": "Acabamentos (corte, ilhós, bastão)",
+          "unidade": "un.",
+          "preco_por_unidade": 4
+        }
+      },
+      "custo_fixo": 6,
+      "multiplicador": 2.2,
+      "reserva_percentual": 10,
+      "minimo": 30,
+      "prazo": "2 a 4 dias úteis"
+    },
+    "instalacao": {
+      "variaveis": {
+        "area_m2": {
+          "rotulo": "Área instalada",
+          "unidade": "m²",
+          "preco_por_unidade": 25
+        },
+        "km": {
+          "rotulo": "Deslocamento",
+          "unidade": "km",
+          "preco_por_unidade": 1.5
+        }
+      },
+      "custo_fixo": 20,
+      "multiplicador": 1.8,
+      "reserva_percentual": 10,
+      "minimo": 120,
+      "prazo": "conforme a agenda de instalação"
+    }
+  }
+}

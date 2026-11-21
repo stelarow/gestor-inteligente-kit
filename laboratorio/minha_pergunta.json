@@ -1,0 +1,17 @@
+{
+  "quer_horario_noturno": {
+    "type": "noul",
+    "instructions": "Did the customer say they can only be attended in the evening (after 18h)?"
+  },
+  "assunto": {
+    "type": "choice",
+    "instructions": "What is the main subject of this conversation?",
+    "criteria": {
+      "preco": "Price or payment conditions.",
+      "duvida_produto": "How the product or service works.",
+      "agendamento": "Booking a visit, meeting or service.",
+      "pos_venda": "Help after buying.",
+      "outro": "Anything else."
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "_explicacao": "obrigatorios = o que a IA precisa pedir antes de cadastrar. url_api vazio = grava em dados/cadastros.csv.",
+  "obrigatorios": [
+    "nome",
+    "telefone",
+    "produto"
+  ],
+  "url_api": "",
+  "cabecalhos": {}
+}
